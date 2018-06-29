@@ -1,0 +1,131 @@
+body{
+    background-color: rgb(192, 185, 185);
+}
+
+#mainPage{
+    width: 50%;
+    float: left; 
+    position: relative;
+    left: 10%;
+}
+
+#subPage{
+    width: 40%;
+    float: right;
+    position: relative;
+}
+
+.loginText,.newAccount{
+    width: 400px;
+    margin: 30px auto;
+    padding: 20px;
+    border: 3px solid #555;
+}
+
+.login{
+    text-align: center;
+}
+
+.loginText p{
+    font-size: 14px;
+}
+
+.formTitle{
+    font-size: 100px;
+    text-align: center;
+    color: black;
+    border-bottom: dashed 3px #3f3f3f;
+}
+
+.name,.pass{
+    margin-bottom: 20px;
+}
+
+.loginText input[type = "text"],
+.loginText input[type = "password"],
+.newAccount input[type = "text"],
+.newAccount input[type = "password"]{
+    border:1px solid #3f3f3f;
+    width: 300px;
+    padding: 4px;
+    font-size: 14px;
+}
+
+.content{
+    border:1px solid #3f3f3f;
+    /* width: 300px;
+    height: 150px;
+    padding: 4px;
+    font-size: 14px; */
+}
+
+.Des{
+    font-size: 10px;
+}
+
+.newAccount select{
+    position: relative;
+    width: 100px;
+    /* -webkit-appearance: none; */
+    -moz-appearance: none;
+    appearance: none;
+    border: 1px solid #3f3f3f;
+    background: -moz-linear-gradient(top,#fff 0%,#efebe1 100%);
+    background: linear-gradient(to bottom ,#fff 0%,#efebe1 100%);
+}
+
+.submit{
+    text-align: center;
+}
+
+.schedule01{
+    font-size: 15px;
+    text-align: center;
+    color: black;
+    border-bottom: dashed 3px #3f3f3f;
+}
+
+.makeAccount{
+    font-size: 20px;
+    text-align: center;
+    color: black;
+    border-bottom: dashed 3px #3f3f3f;
+    
+}
+
+.todayDisplay{
+    font-size: 12px;
+    text-align: center;
+    background-color: #3f3f3f;
+    color: aliceblue;
+}
+
+tabel,th,td{
+    border-collapse: collapse;
+    border: 1px solid #ccc;
+    line-height: 1.5;
+}
+
+table.type01 th{
+    width: 150px;
+    padding: 10px;
+    font-weight: bold;
+    vertical-align: top;
+    background: #3f3f3f;
+    color: #ffffff;
+}
+
+table.type01 td{
+    width: 350px;
+    padding: 10px;
+    vertical-align: top;
+}
+
+.checkbox input[type=checkbox] {
+	width:			60px;
+	height:			60px;
+	-moz-transform:		scale(1.4);
+	-webkit-transform:	scale(1.4);
+	transform:		scale(1.4);
+}
+

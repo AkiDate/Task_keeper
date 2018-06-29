@@ -1,0 +1,262 @@
+<!-- コンセプト:自分の日程を管理できるスケジュールサイト -->
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Task Keeper</title>
+    <link rel="stylesheet" href="./new_project.css">
+<script>
+    function toDate(str,delim){
+        var arr = str.split(delim)
+        return new Date(arr[0],arr[1]-1,arr[2]);
+    };
+</script>
+<body>
+<script>
+    req = new XMLHttpRequest();
+    var date = new Date();
+    var account = {};
+    var schedule = [];
+    var afterSchedule = [];
+    var deleteDate = {};
+    var textYear;
+    var textMonth;
+    var textDay;
+    var textBox;
+
+    var year = date.getFullYear();
+    var month = date.getMonth()+1;//1月は0,2月は1が返ってくる。
+    var week = date.getDay();//日曜日は0,月曜日は1が返ってくる。
+    var day = date.getDate();
+
+    var today = new Array('日','月','火','水','木','金','土');
+    document.write("<header><p class = 'todayDisplay'>");
+    document.write('今日は'+year+'年'+month+'月'+day+'日'+'('+today[week]+')です');
+    document.write("</p></header>");
+    document.write('<div id= "loginText"><div class = "loginText"><p class = "formTitle">Login</p><div class = "login"><input type = "text" name = "name" id = "name" placeholder = "ユーザーネーム"><input type = "password" name = "pass" id = "pass" placeholder = "password"></div><div class = "submit"><input type = "submit" name = "button2" id = "button2" value = "Sign up"><input type="submit" name="button1" id="button1" value="Sign in"></div></div></div>');
+    document.write('<div id = "mainPage">');
+    document.write('<div  id="now"></div>');
+    document.write('</div>');
+    document.write('<div id="subPage">');
+    document.write('<div id ="changePage"></div>');
+    document.write('</div>');
+
+    function displayNow(state){
+        if(state == 0){  //アカウント登録
+            textYear = '<select id = "newYear">'
+            for(var i = 0; i < 50;i++){
+                textYear += '<option value = "'+(year+i)+'">'+(year+i)+'</option>';
+            }
+            textYear += '</select>';
+
+            textMonth = '<select id = "newMonth">'
+            for(var i = 0; i < 12 ; i++){
+                textMonth += '<option value = "'+(i+1)+'">'+(i+1)+'</option>';
+            }
+            textMonth += '</select>';""
+
+            textDay = '<select id = "newDay">'
+            for(var i = 0; i < 31 ; i++){
+                textDay += '<option value = "'+(i+1)+'">'+(i+1)+'</option>';
+            }
+            textDay += '</select>';
+
+            document.getElementById("loginText").innerHTML='<p><span class = "makeAccount">Make Account</span></p><p class = "Des">まずはじめにスケジュールを登録してみよう！</p><div class = "newAccount"><input type="text" name = "newName" id = "newName" placeholder="ユーザーネーム"><br><input type = "password" name = "newPass" id = "newPass" placeholder="password" ><br>'+textYear+textMonth+textDay+'<br><input type = "text" name = "newContent" id = "newContent" class = "content" placeholder = "スケジュール" value=""><br><input type = "submit" name = "creAccount" id = "creAccount" value = "アカウント登録"></div>';
+
+            var creAccount = document.getElementById("creAccount");
+            creAccount.addEventListener("click",function(){
+                newYear = document.getElementById("newYear").value;
+                newMonth = document.getElementById("newMonth").value;
+                newDay = document.getElementById("newDay").value;
+                text = newYear+'/'+newMonth+'/'+newDay;
+                account['name'] = document.getElementById("newName").value;
+                account['pass'] = document.getElementById("newPass").value;
+                account['date'] = text;
+                account['content'] = document.getElementById("newContent").value;
+                account['flag'] = 0;
+                console.log(account); 
+                var newDate = new Date(newYear,newMonth-1,newDay);
+                var testMonth = newDate.getMonth();
+                if(newMonth == (testMonth+1)){
+                    req.open("POST",'new_project.php',true);
+                    req.setRequestHeader("Content-Type","application/json; charset=utf-8");
+                    req.send(JSON.stringify(account));                     
+                    req.onload = function(){
+                        text = req.responseText;
+                        json = eval("("+text+")");
+                        var jsonCount = json.length;
+                        account['name'] = json[0]['name'];
+                        account['pass'] = json[0]['pass'];
+                        if(jsonCount == 0){
+                            alert("このユーザー名は既に使用されています");
+                        }else {
+                            alert("accountを作成しました！");
+                            displayNow(1);  //この先はフローチャート１番へ
+                        }
+                    }
+                }else{
+                    alert("無効な日付が指定されています");
+                }
+            },false);
+        }else if(state == 1){    //マイページ移行時
+            delete schedule;
+            schedule = json;
+            schedule.sort(function(a,b){
+                return(a.date<b.date?-1:1);
+            });
+            count_S = schedule.length;
+            countSum = 0;
+            textDate = year+'-'+month+'-'+day;
+            var date1 = toDate(textDate,'-');
+            afterSchedule = [];
+            for(var i = 0 ; i < count_S ; i++){  //現在よりも先の予定を配列に登録
+                var date2 = toDate(schedule[i].date,'-');
+                if(date2>=date1){
+                    afterSchedule[countSum] = schedule[i];
+                    countSum++;
+                }
+            }
+
+            textBox = '<p><span class = "schedule01">Next Schedule</span></p><p><span class = "Des">今日からのスケジュールを表示しています</span></p><table class = "type01" border = 1 align = "center"><tr><th>日程</th><th>内容</th></tr>';
+            count_S = afterSchedule.length;
+            for(var i = 0 ; i < count_S ; i++){
+                if(afterSchedule[i].content == null){
+                    afterSchedule[i].content = '予定が記入されていません';
+                }
+                textBox += '<tr><td><input class = "checkbox" type = "checkbox" id ="ch'+i+'" >';
+                textBox += afterSchedule[i].date;
+                textBox += '</input></td><td>';
+                textBox += afterSchedule[i].content;
+                textBox += '</td></tr>'
+            }
+            textBox += '</table>';
+
+            document.getElementById("loginText").innerHTML = null;
+            document.getElementById("now").innerHTML = textBox;
+
+            textYear = '<select id = "nextYear">'
+            for(var i = 0; i < 50;i++){
+                textYear += '<option value = "'+(year+i)+'">'+(year+i)+'</option>';
+            }
+            textYear += '</select>';
+
+            textMonth = '<select id = "nextMonth">'
+            for(var i = 1; i <= 12 ; i++){
+                if(i == month){
+                    textMonth += '<option selected value = "'+i+'">'+i+'</option>';
+                }else{
+                    textMonth += '<option value = "'+i+'">'+i+'</option>';
+                }
+            }
+            textMonth += '</select>';""
+
+            textDay = '<select id = "nextDay">'
+            for(var i = 1; i <= 31 ; i++){
+                if(i == day){
+                    textDay += '<option selected value = "'+i+'">'+i+'</option>'
+                }else {
+                    textDay += '<option value = "'+i+'">'+i+'</option>';
+                }
+            }
+            textDay += '</select>';
+
+            document.getElementById("changePage").innerHTML = '<p><span class = "schedule01">New Schedule</span></p><p><span class = "Des">新たなスケジュールを登録しよう!</span></p>'+textYear+textMonth+textDay+'<br><textarea type = "text" id = "nextContent" maxlength = "1024" cols = "40" rows = "5" wrap = "soft" class = "content"placeholder = "スケジュールを記入" ></textarea><input type = "submit" id = "nextSchedule" value = "追加"><br><p><span class = "schedule01">Delete Schedule</span><br><p class = "Des">スケジュールの日程にcheckをし、削除ボタンを押して下してください</span></p><input type = "submit" id = "delete" value = "Scheduleを削除">';
+            nextSchedule = document.getElementById("nextSchedule");
+            deleteSchedule = document.getElementById("delete");
+
+            deleteSchedule.addEventListener("click",function(){
+                count = afterSchedule.length;
+                var deleteNumber = 1;
+                deleteDate = {};
+                deleteDate['flag'] = 3;
+                for(var i = 0 ; i < count;i++){
+                    if(document.getElementById("ch"+i).checked == true){
+                        deleteDate[deleteNumber] = afterSchedule[i]['id'];
+                        if(deleteNumber == 1){
+                            deleteDate['name'] = afterSchedule[i]['name'];
+                            deleteDate['pass'] = afterSchedule[i]['pass'];
+                        }
+                        deleteNumber++;
+                    }
+                }
+                console.log(deleteDate);
+                if(deleteDate.name){
+                    req.open("POST",'new_project.php',true);
+                    req.setRequestHeader("Content-Type","application/json; charset=utf-8");
+                    req.send(JSON.stringify(deleteDate));
+                    req.onload = function(){
+                        text = req.responseText;
+                        json = eval("("+text+")");
+                        displayNow(1);
+                    }
+                }else {
+                    alert("日程にcheckを入れてください");
+                }
+            },false);
+
+            nextSchedule.addEventListener("click",function(){
+                newYear = document.getElementById("nextYear").value;
+                newMonth = document.getElementById("nextMonth").value;
+                newDay = document.getElementById("nextDay").value;
+                text = newYear+'/'+newMonth+'/'+newDay;
+                account['date'] = text;
+                account['content'] = document.getElementById("nextContent").value;
+                account['flag'] = 2;
+ 
+                var newDate = new Date(newYear,newMonth-1,newDay);
+                var testMonth = newDate.getMonth();
+                if(newMonth == (testMonth+1)){
+                    req.open("POST",'new_project.php',true);
+                    req.setRequestHeader("Content-Type","application/json; charset=utf-8");
+                    req.send(JSON.stringify(account));
+                    req.onload = function(){
+                        text = req.responseText;
+                        json = eval("("+text+")");
+                        var count = json.length;
+                        displayNow(1);
+                    }
+                }else {
+                    alert("無効な日付が設定されています");
+                }
+            },false);
+        }else if(state == 2){
+
+        }
+    }
+
+    var button1 = document.getElementById("button1");
+    var button2 = document.getElementById("button2");
+
+    button1.addEventListener("click",function(){        
+        account['name'] = document.getElementById("name").value;
+        account['pass'] = document.getElementById("pass").value;
+        account['flag'] = 1;
+        req.open("POST",'new_project.php',true);
+        req.setRequestHeader("Content-Type","application/json; charset=utf-8");
+        req.send(JSON.stringify(account));                     
+        req.onload = function(){
+            text = req.responseText;
+            // alert(text);
+            json = eval("("+text+")");
+            var count = json.length;
+            if(count != 0){
+                account['name'] = json[0]['name'];
+                account['pass'] = json[0]['pass'];
+                displayNow(1);
+                //この先はフローチャート１番へ
+            }else {
+                alert("再入力をお願いします");
+            }                   
+        }
+            //この先はフローチャート2番へ
+    },false); 
+
+    button2.addEventListener("click",function(){
+        displayNow(0);
+    },false);
+</script>
+</body>
+</html>
