@@ -122,10 +122,10 @@ table.type01 td{
 }
 
 .checkbox input[type=checkbox] {
-	width:			60px;
-	height:			60px;
-	-moz-transform:		scale(1.4);
-	-webkit-transform:	scale(1.4);
-	transform:		scale(1.4);
+	width: 60px;
+	height:	60px;
+	-moz-transform:	scale(1.4);
+	-webkit-transform: scale(1.4);
+	transform: scale(1.4);
 }
 
