@@ -27,6 +27,8 @@
     var textMonth;
     var textDay;
     var textBox;
+    var creName;
+    var crePass;
 
     var year = date.getFullYear();
     var month = date.getMonth()+1;//1月は0,2月は1が返ってくる。
@@ -78,19 +80,20 @@
                 account['date'] = text;
                 account['content'] = document.getElementById("newContent").value;
                 account['flag'] = 0;
-                console.log(account); 
                 var newDate = new Date(newYear,newMonth-1,newDay);
                 var testMonth = newDate.getMonth();
                 if(newMonth == (testMonth+1)){
                     req.open("POST",'new_project.php',true);
                     req.setRequestHeader("Content-Type","application/json; charset=utf-8");
-                    req.send(JSON.stringify(account));                     
+                    req.send(JSON.stringify(account));  
+                    creName = account['name'];
+                    crePass = account['pass'];                   
                     req.onload = function(){
                         text = req.responseText;
                         json = eval("("+text+")");
                         var jsonCount = json.length;
-                        account['name'] = json[0]['name'];
-                        account['pass'] = json[0]['pass'];
+                        account['name'] = creName;
+                        account['pass'] = crePass;
                         if(jsonCount == 0){
                             alert("このユーザー名は既に使用されています");
                         }else {
@@ -135,7 +138,7 @@
             }
             textBox += '</table>';
 
-            document.getElementById("loginText").innerHTML = null;
+            document.getElementById("loginText").innerHTML = '';
             document.getElementById("now").innerHTML = textBox;
 
             textYear = '<select id = "nextYear">'
@@ -183,7 +186,6 @@
                         deleteNumber++;
                     }
                 }
-                console.log(deleteDate);
                 if(deleteDate.name){
                     req.open("POST",'new_project.php',true);
                     req.setRequestHeader("Content-Type","application/json; charset=utf-8");
@@ -206,7 +208,6 @@
                 account['date'] = text;
                 account['content'] = document.getElementById("nextContent").value;
                 account['flag'] = 2;
- 
                 var newDate = new Date(newYear,newMonth-1,newDay);
                 var testMonth = newDate.getMonth();
                 if(newMonth == (testMonth+1)){
@@ -240,7 +241,6 @@
         req.send(JSON.stringify(account));                     
         req.onload = function(){
             text = req.responseText;
-            // alert(text);
             json = eval("("+text+")");
             var count = json.length;
             if(count != 0){
